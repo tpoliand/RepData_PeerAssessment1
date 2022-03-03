@@ -11,14 +11,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## 1. Loading and preprocessing the data
 
-```{r 1}
+```{r}
+download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", destfile = "activity.zip", mode="wb")
 unzip("activity.zip")
 stepdata = read.csv("activity.csv", header = TRUE)
 ```
 
 ## 2. What is mean total number of steps taken per day?
 
-```{r 2}
+```{r}
 library(magrittr)
 library(dplyr)
 
@@ -30,9 +31,31 @@ databydate = stepdata %>%
         print(n=60)
 ```
 
-## 3. What is the average daily activity pattern?
 
-```{r 3}
+## 2. Make a histogram of the total number of steps taken each day
+
+```{r}
+library(magrittr)
+library(dplyr)
+
+databydate = stepdata %>% 
+        select(date, steps) %>% 
+        group_by(date) %>% 
+        summarize(tsteps= sum(steps)) %>%
+        na.omit() %>%
+        print(n=60)
+```
+
+## 3. Calculate and report the mean and median of the total number of steps taken per day
+
+```{r}
+mean(databydate$tsteps)
+median(databydate$tsteps)
+```
+
+## 4. Time series plot
+
+```{r}
 library(ggplot2)
 
 databyinterval <- stepdata %>% 
@@ -45,8 +68,7 @@ ggplot(databyinterval, aes(x=interval, y=tsteps)) + geom_line()
 ```
 
 ## 4. Imputing missing values
-
-```{r 4}
+```{r}
 replacewithmean <- function(x) replace(x, is.na(x), mean(x, na.rm = TRUE))
 
 meandata <- stepdata %>% 
@@ -55,9 +77,47 @@ meandata <- stepdata %>%
         print(n=60)
 ```
 
-## 5. Are there differences in activity patterns between weekdays and weekends?
+# 5. The 5-minute interval that, on average, contains the maximum number of steps
+```{r}
+databyinterval[which(databyinterval$tsteps == max(databyinterval$tsteps)),]
+```
 
-```{r 5}
+# 6. Code to describe and show a strategy for imputing missing data
+```{r}
+# code to describe
+missingVals <- sum(is.na(data))
+## Warning in is.na(data): is.na() applied to non-(list or vector) of type
+## 'closure'
+missingVals
+## [1] 0
+
+# strategy for imputing missing data
+replacewithmean <- function(x) replace(x, is.na(x), mean(x, na.rm = TRUE))
+
+meandata <- stepdata %>% 
+        group_by(interval) %>% 
+        mutate(steps= replacewithmean(steps))
+
+meandata
+
+```
+
+# 7. Histogram of the total number of steps taken each day after missing values are imputed
+```{r}
+FullSummedDataByDay <- aggregate(meandata$steps, by=list(meandata$date), sum)
+
+FullSummedDataByDay
+
+names(FullSummedDataByDay)[1] ="date"
+names(FullSummedDataByDay)[2] ="totalsteps"
+
+summary(FullSummedDataByDay)
+
+hist(FullSummedDataByDay$totalsteps, xlab = "Steps", ylab = "Frequency", main = "Total Daily Steps", breaks = 20)
+```
+
+# 8. Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
+```{r}
 meandata$date <- as.Date(meandata$date)
 meandata$weekday <- weekdays(meandata$date)
 meandata$weekend <- ifelse(meandata$weekday=="Saturday" | meandata$weekday=="Sunday", "Weekend", "Weekday" )
@@ -72,5 +132,4 @@ ggplot(meandataweekendweekday, aes(x=interval, y=steps, color=weekend)) + geom_l
         facet_grid(weekend ~.) + xlab("Interval") + ylab("Mean of Steps") +
         ggtitle("Comparison of Average Number of Steps in Each Interval")
 ```
-
 

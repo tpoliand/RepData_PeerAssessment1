@@ -170,7 +170,8 @@ pre code {
 
 <div id="loading-and-preprocessing-the-data" class="section level2">
 <h2>1. Loading and preprocessing the data</h2>
-<pre class="r"><code>unzip(&quot;activity.zip&quot;)
+<pre class="r"><code>download.file(&quot;https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip&quot;, destfile = &quot;activity.zip&quot;, mode=&quot;wb&quot;)
+unzip(&quot;activity.zip&quot;)
 stepdata = read.csv(&quot;activity.csv&quot;, header = TRUE)</code></pre>
 </div>
 <div id="what-is-mean-total-number-of-steps-taken-per-day" class="section level2">
@@ -248,8 +249,83 @@ library(dplyr)</code></pre>
 ## 52 2012-11-28  10183
 ## 53 2012-11-29   7047</code></pre>
 </div>
-<div id="what-is-the-average-daily-activity-pattern" class="section level2">
-<h2>3. What is the average daily activity pattern?</h2>
+<div id="make-a-histogram-of-the-total-number-of-steps-taken-each-day" class="section level2">
+<h2>2. Make a histogram of the total number of steps taken each day</h2>
+<pre class="r"><code>library(magrittr)
+library(dplyr)
+
+databydate = stepdata %&gt;% 
+        select(date, steps) %&gt;% 
+        group_by(date) %&gt;% 
+        summarize(tsteps= sum(steps)) %&gt;%
+        na.omit() %&gt;%
+        print(n=60)</code></pre>
+<pre><code>## # A tibble: 53 x 2
+##    date       tsteps
+##    &lt;chr&gt;       &lt;int&gt;
+##  1 2012-10-02    126
+##  2 2012-10-03  11352
+##  3 2012-10-04  12116
+##  4 2012-10-05  13294
+##  5 2012-10-06  15420
+##  6 2012-10-07  11015
+##  7 2012-10-09  12811
+##  8 2012-10-10   9900
+##  9 2012-10-11  10304
+## 10 2012-10-12  17382
+## 11 2012-10-13  12426
+## 12 2012-10-14  15098
+## 13 2012-10-15  10139
+## 14 2012-10-16  15084
+## 15 2012-10-17  13452
+## 16 2012-10-18  10056
+## 17 2012-10-19  11829
+## 18 2012-10-20  10395
+## 19 2012-10-21   8821
+## 20 2012-10-22  13460
+## 21 2012-10-23   8918
+## 22 2012-10-24   8355
+## 23 2012-10-25   2492
+## 24 2012-10-26   6778
+## 25 2012-10-27  10119
+## 26 2012-10-28  11458
+## 27 2012-10-29   5018
+## 28 2012-10-30   9819
+## 29 2012-10-31  15414
+## 30 2012-11-02  10600
+## 31 2012-11-03  10571
+## 32 2012-11-05  10439
+## 33 2012-11-06   8334
+## 34 2012-11-07  12883
+## 35 2012-11-08   3219
+## 36 2012-11-11  12608
+## 37 2012-11-12  10765
+## 38 2012-11-13   7336
+## 39 2012-11-15     41
+## 40 2012-11-16   5441
+## 41 2012-11-17  14339
+## 42 2012-11-18  15110
+## 43 2012-11-19   8841
+## 44 2012-11-20   4472
+## 45 2012-11-21  12787
+## 46 2012-11-22  20427
+## 47 2012-11-23  21194
+## 48 2012-11-24  14478
+## 49 2012-11-25  11834
+## 50 2012-11-26  11162
+## 51 2012-11-27  13646
+## 52 2012-11-28  10183
+## 53 2012-11-29   7047</code></pre>
+</div>
+<div id="calculate-and-report-the-mean-and-median-of-the-total-number-of-steps-taken-per-day" class="section level2">
+<h2>3. Calculate and report the mean and median of the total number of steps taken per day</h2>
+<pre class="r"><code>mean(databydate$tsteps)</code></pre>
+<pre><code>## [1] 10766.19</code></pre>
+<pre class="r"><code>median(databydate$tsteps)</code></pre>
+<pre><code>## [1] 10765</code></pre>
+</div>
+<div id="time-series-plot" class="section level2">
+<h2>4. Time series plot</h2>
 <pre class="r"><code>library(ggplot2)
 
 databyinterval &lt;- stepdata %&gt;% 
@@ -335,8 +411,133 @@ meandata &lt;- stepdata %&gt;%
 ## 60 1.11   2012-10-01      455
 ## # ... with 17,508 more rows</code></pre>
 </div>
-<div id="are-there-differences-in-activity-patterns-between-weekdays-and-weekends" class="section level2">
-<h2>5. Are there differences in activity patterns between weekdays and weekends?</h2>
+<div id="the-5-minute-interval-that-on-average-contains-the-maximum-number-of-steps" class="section level1">
+<h1>5. The 5-minute interval that, on average, contains the maximum number of steps</h1>
+<pre class="r"><code>databyinterval[which(databyinterval$tsteps == max(databyinterval$tsteps)),]</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##   interval tsteps
+##      &lt;int&gt;  &lt;dbl&gt;
+## 1      835   206.</code></pre>
+</div>
+<div id="code-to-describe-and-show-a-strategy-for-imputing-missing-data" class="section level1">
+<h1>6. Code to describe and show a strategy for imputing missing data</h1>
+<pre class="r"><code># code to describe
+missingVals &lt;- sum(is.na(data))</code></pre>
+<pre><code>## Warning in is.na(data): is.na() applied to non-(list or vector) of type
+## &#39;closure&#39;</code></pre>
+<pre class="r"><code>## Warning in is.na(data): is.na() applied to non-(list or vector) of type
+## &#39;closure&#39;
+missingVals</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>## [1] 0
+
+# strategy for imputing missing data
+replacewithmean &lt;- function(x) replace(x, is.na(x), mean(x, na.rm = TRUE))
+
+meandata &lt;- stepdata %&gt;% 
+        group_by(interval) %&gt;% 
+        mutate(steps= replacewithmean(steps))
+
+meandata</code></pre>
+<pre><code>## # A tibble: 17,568 x 3
+## # Groups:   interval [288]
+##     steps date       interval
+##     &lt;dbl&gt; &lt;chr&gt;         &lt;int&gt;
+##  1 1.72   2012-10-01        0
+##  2 0.340  2012-10-01        5
+##  3 0.132  2012-10-01       10
+##  4 0.151  2012-10-01       15
+##  5 0.0755 2012-10-01       20
+##  6 2.09   2012-10-01       25
+##  7 0.528  2012-10-01       30
+##  8 0.868  2012-10-01       35
+##  9 0      2012-10-01       40
+## 10 1.47   2012-10-01       45
+## # ... with 17,558 more rows</code></pre>
+</div>
+<div id="histogram-of-the-total-number-of-steps-taken-each-day-after-missing-values-are-imputed" class="section level1">
+<h1>7. Histogram of the total number of steps taken each day after missing values are imputed</h1>
+<pre class="r"><code>FullSummedDataByDay &lt;- aggregate(meandata$steps, by=list(meandata$date), sum)
+
+FullSummedDataByDay</code></pre>
+<pre><code>##       Group.1        x
+## 1  2012-10-01 10766.19
+## 2  2012-10-02   126.00
+## 3  2012-10-03 11352.00
+## 4  2012-10-04 12116.00
+## 5  2012-10-05 13294.00
+## 6  2012-10-06 15420.00
+## 7  2012-10-07 11015.00
+## 8  2012-10-08 10766.19
+## 9  2012-10-09 12811.00
+## 10 2012-10-10  9900.00
+## 11 2012-10-11 10304.00
+## 12 2012-10-12 17382.00
+## 13 2012-10-13 12426.00
+## 14 2012-10-14 15098.00
+## 15 2012-10-15 10139.00
+## 16 2012-10-16 15084.00
+## 17 2012-10-17 13452.00
+## 18 2012-10-18 10056.00
+## 19 2012-10-19 11829.00
+## 20 2012-10-20 10395.00
+## 21 2012-10-21  8821.00
+## 22 2012-10-22 13460.00
+## 23 2012-10-23  8918.00
+## 24 2012-10-24  8355.00
+## 25 2012-10-25  2492.00
+## 26 2012-10-26  6778.00
+## 27 2012-10-27 10119.00
+## 28 2012-10-28 11458.00
+## 29 2012-10-29  5018.00
+## 30 2012-10-30  9819.00
+## 31 2012-10-31 15414.00
+## 32 2012-11-01 10766.19
+## 33 2012-11-02 10600.00
+## 34 2012-11-03 10571.00
+## 35 2012-11-04 10766.19
+## 36 2012-11-05 10439.00
+## 37 2012-11-06  8334.00
+## 38 2012-11-07 12883.00
+## 39 2012-11-08  3219.00
+## 40 2012-11-09 10766.19
+## 41 2012-11-10 10766.19
+## 42 2012-11-11 12608.00
+## 43 2012-11-12 10765.00
+## 44 2012-11-13  7336.00
+## 45 2012-11-14 10766.19
+## 46 2012-11-15    41.00
+## 47 2012-11-16  5441.00
+## 48 2012-11-17 14339.00
+## 49 2012-11-18 15110.00
+## 50 2012-11-19  8841.00
+## 51 2012-11-20  4472.00
+## 52 2012-11-21 12787.00
+## 53 2012-11-22 20427.00
+## 54 2012-11-23 21194.00
+## 55 2012-11-24 14478.00
+## 56 2012-11-25 11834.00
+## 57 2012-11-26 11162.00
+## 58 2012-11-27 13646.00
+## 59 2012-11-28 10183.00
+## 60 2012-11-29  7047.00
+## 61 2012-11-30 10766.19</code></pre>
+<pre class="r"><code>names(FullSummedDataByDay)[1] =&quot;date&quot;
+names(FullSummedDataByDay)[2] =&quot;totalsteps&quot;
+
+summary(FullSummedDataByDay)</code></pre>
+<pre><code>##      date             totalsteps   
+##  Length:61          Min.   :   41  
+##  Class :character   1st Qu.: 9819  
+##  Mode  :character   Median :10766  
+##                     Mean   :10766  
+##                     3rd Qu.:12811  
+##                     Max.   :21194</code></pre>
+<pre class="r"><code>hist(FullSummedDataByDay$totalsteps, xlab = &quot;Steps&quot;, ylab = &quot;Frequency&quot;, main = &quot;Total Daily Steps&quot;, breaks = 20)</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="panel-plot-comparing-the-average-number-of-steps-taken-per-5-minute-interval-across-weekdays-and-weekends" class="section level1">
+<h1>8. Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends</h1>
 <pre class="r"><code>meandata$date &lt;- as.Date(meandata$date)
 meandata$weekday &lt;- weekdays(meandata$date)
 meandata$weekend &lt;- ifelse(meandata$weekday==&quot;Saturday&quot; | meandata$weekday==&quot;Sunday&quot;, &quot;Weekend&quot;, &quot;Weekday&quot; )
