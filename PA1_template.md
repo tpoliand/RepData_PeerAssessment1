@@ -109,14 +109,7 @@ databydate = stepdata %>%
 ## 53 2012-11-29   7047
 ```
 
-
-## 2. Make a histogram of the total number of steps taken each day
-
-
 ```r
-library(magrittr)
-library(dplyr)
-
 databydate = stepdata %>% 
         select(date, steps) %>% 
         group_by(date) %>% 
@@ -218,86 +211,7 @@ databyinterval <- stepdata %>%
 ggplot(databyinterval, aes(x=interval, y=tsteps)) + geom_line()
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
-
-## 4. Imputing missing values
-
-```r
-replacewithmean <- function(x) replace(x, is.na(x), mean(x, na.rm = TRUE))
-
-meandata <- stepdata %>% 
-        group_by(interval) %>% 
-        mutate(steps= replacewithmean(steps)) %>%
-        print(n=60)
-```
-
-```
-## # A tibble: 17,568 x 3
-## # Groups:   interval [288]
-##     steps date       interval
-##     <dbl> <chr>         <int>
-##  1 1.72   2012-10-01        0
-##  2 0.340  2012-10-01        5
-##  3 0.132  2012-10-01       10
-##  4 0.151  2012-10-01       15
-##  5 0.0755 2012-10-01       20
-##  6 2.09   2012-10-01       25
-##  7 0.528  2012-10-01       30
-##  8 0.868  2012-10-01       35
-##  9 0      2012-10-01       40
-## 10 1.47   2012-10-01       45
-## 11 0.302  2012-10-01       50
-## 12 0.132  2012-10-01       55
-## 13 0.321  2012-10-01      100
-## 14 0.679  2012-10-01      105
-## 15 0.151  2012-10-01      110
-## 16 0.340  2012-10-01      115
-## 17 0      2012-10-01      120
-## 18 1.11   2012-10-01      125
-## 19 1.83   2012-10-01      130
-## 20 0.170  2012-10-01      135
-## 21 0.170  2012-10-01      140
-## 22 0.377  2012-10-01      145
-## 23 0.264  2012-10-01      150
-## 24 0      2012-10-01      155
-## 25 0      2012-10-01      200
-## 26 0      2012-10-01      205
-## 27 1.13   2012-10-01      210
-## 28 0      2012-10-01      215
-## 29 0      2012-10-01      220
-## 30 0.132  2012-10-01      225
-## 31 0      2012-10-01      230
-## 32 0.226  2012-10-01      235
-## 33 0      2012-10-01      240
-## 34 0      2012-10-01      245
-## 35 1.55   2012-10-01      250
-## 36 0.943  2012-10-01      255
-## 37 0      2012-10-01      300
-## 38 0      2012-10-01      305
-## 39 0      2012-10-01      310
-## 40 0      2012-10-01      315
-## 41 0.208  2012-10-01      320
-## 42 0.623  2012-10-01      325
-## 43 1.62   2012-10-01      330
-## 44 0.585  2012-10-01      335
-## 45 0.491  2012-10-01      340
-## 46 0.0755 2012-10-01      345
-## 47 0      2012-10-01      350
-## 48 0      2012-10-01      355
-## 49 1.19   2012-10-01      400
-## 50 0.943  2012-10-01      405
-## 51 2.57   2012-10-01      410
-## 52 0      2012-10-01      415
-## 53 0.340  2012-10-01      420
-## 54 0.358  2012-10-01      425
-## 55 4.11   2012-10-01      430
-## 56 0.660  2012-10-01      435
-## 57 3.49   2012-10-01      440
-## 58 0.830  2012-10-01      445
-## 59 3.11   2012-10-01      450
-## 60 1.11   2012-10-01      455
-## # ... with 17,508 more rows
-```
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 # 5. The 5-minute interval that, on average, contains the maximum number of steps
 
@@ -459,7 +373,7 @@ summary(FullSummedDataByDay)
 hist(FullSummedDataByDay$totalsteps, xlab = "Steps", ylab = "Frequency", main = "Total Daily Steps", breaks = 20)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 # 8. Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
 
@@ -479,5 +393,5 @@ ggplot(meandataweekendweekday, aes(x=interval, y=steps, color=weekend)) + geom_l
         ggtitle("Comparison of Average Number of Steps in Each Interval")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 

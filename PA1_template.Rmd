@@ -29,14 +29,6 @@ databydate = stepdata %>%
         summarize(tsteps= sum(steps)) %>%
         na.omit() %>%
         print(n=60)
-```
-
-
-## 2. Make a histogram of the total number of steps taken each day
-
-```{r}
-library(magrittr)
-library(dplyr)
 
 databydate = stepdata %>% 
         select(date, steps) %>% 
@@ -65,16 +57,6 @@ databyinterval <- stepdata %>%
         summarize(tsteps= mean(steps)) 
 
 ggplot(databyinterval, aes(x=interval, y=tsteps)) + geom_line()
-```
-
-## 4. Imputing missing values
-```{r}
-replacewithmean <- function(x) replace(x, is.na(x), mean(x, na.rm = TRUE))
-
-meandata <- stepdata %>% 
-        group_by(interval) %>% 
-        mutate(steps= replacewithmean(steps)) %>%
-        print(n=60)
 ```
 
 # 5. The 5-minute interval that, on average, contains the maximum number of steps
