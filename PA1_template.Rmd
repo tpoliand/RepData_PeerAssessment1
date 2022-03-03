@@ -1,25 +1,76 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
+title: 'Reproducible Research: Peer Assessment 1'
 output: 
   html_document:
     keep_md: true
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
-## Loading and preprocessing the data
+## 1. Loading and preprocessing the data
+
+```{r 1}
+unzip("activity.zip")
+stepdata = read.csv("activity.csv", header = TRUE)
+```
+
+## 2. What is mean total number of steps taken per day?
+
+```{r 2}
+library(magrittr)
+library(dplyr)
+
+databydate = stepdata %>% 
+        select(date, steps) %>% 
+        group_by(date) %>% 
+        summarize(tsteps= sum(steps)) %>%
+        na.omit() %>%
+        print(n=60)
+```
+
+## 3. What is the average daily activity pattern?
+
+```{r 3}
+library(ggplot2)
+
+databyinterval <- stepdata %>% 
+        select(interval, steps) %>% 
+        na.omit() %>% 
+        group_by(interval) %>% 
+        summarize(tsteps= mean(steps)) 
+
+ggplot(databyinterval, aes(x=interval, y=tsteps)) + geom_line()
+```
+
+## 4. Imputing missing values
+
+```{r 4}
+replacewithmean <- function(x) replace(x, is.na(x), mean(x, na.rm = TRUE))
+
+meandata <- stepdata %>% 
+        group_by(interval) %>% 
+        mutate(steps= replacewithmean(steps)) %>%
+        print(n=60)
+```
+
+## 5. Are there differences in activity patterns between weekdays and weekends?
+
+```{r 5}
+meandata$date <- as.Date(meandata$date)
+meandata$weekday <- weekdays(meandata$date)
+meandata$weekend <- ifelse(meandata$weekday=="Saturday" | meandata$weekday=="Sunday", "Weekend", "Weekday" )
+
+library(ggplot2)
+
+meandataweekendweekday <- aggregate(meandata$steps , by= list(meandata$weekend, meandata$interval), na.omit(mean))
+
+names(meandataweekendweekday) <- c("weekend", "interval", "steps")
+
+ggplot(meandataweekendweekday, aes(x=interval, y=steps, color=weekend)) + geom_line() +
+        facet_grid(weekend ~.) + xlab("Interval") + ylab("Mean of Steps") +
+        ggtitle("Comparison of Average Number of Steps in Each Interval")
+```
 
 
-
-## What is mean total number of steps taken per day?
-
-
-
-## What is the average daily activity pattern?
-
-
-
-## Imputing missing values
-
-
-
-## Are there differences in activity patterns between weekdays and weekends?
